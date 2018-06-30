@@ -1,6 +1,7 @@
 ﻿using System;
+using System.Web;
 using System.Web.Mvc;
-using CSM30Ultrassom;
+using Web.Lib;
 
 namespace Web.Controllers
 {
@@ -33,7 +34,9 @@ namespace Web.Controllers
             string nomeArquivoImagem = nomeDoArquivo.Replace(".txt", ".bmp");
 
             //TODO: Alterar para retornar o arquivo com a imagem ou retornar uma mensagem de processando 
-            if (System.IO.File.Exists(@".\" + nomeArquivoImagem)) 
+            // O parâmetro nomeDoArquivo recebe o valor que o usuário digita no formulário!
+            var path = System.Web.HttpContext.Current.Server.MapPath("~/Content/Images/");
+            if (System.IO.File.Exists(path + nomeArquivoImagem)) 
                 return "File exists."; //retorna o bitmap
 
             else if(processamento.getElementoFila(nomeDoArquivo))
@@ -42,7 +45,7 @@ namespace Web.Controllers
             }
             else
             {
-                processamento.processa("nomeDoArquivo", resultadoFinal);
+                processamento.processa(nomeDoArquivo, resultadoFinal);
                 return "Adicionando na fila de processamento";
             }
                 

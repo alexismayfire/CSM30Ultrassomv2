@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27428.2037
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSM30Ultrassom", "CSM30Ultrassom\CSM30Ultrassom.csproj", "{589F7CB7-F827-44A4-9E60-292141B971B4}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Web", "Web\Web.csproj", "{A6913F9A-502D-4F5F-AA1B-D027D65507C1}"
 EndProject
 Global
@@ -15,14 +13,6 @@ Global
 		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{589F7CB7-F827-44A4-9E60-292141B971B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{589F7CB7-F827-44A4-9E60-292141B971B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{589F7CB7-F827-44A4-9E60-292141B971B4}.Debug|x64.ActiveCfg = Debug|x64
-		{589F7CB7-F827-44A4-9E60-292141B971B4}.Debug|x64.Build.0 = Debug|x64
-		{589F7CB7-F827-44A4-9E60-292141B971B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{589F7CB7-F827-44A4-9E60-292141B971B4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{589F7CB7-F827-44A4-9E60-292141B971B4}.Release|x64.ActiveCfg = Release|x64
-		{589F7CB7-F827-44A4-9E60-292141B971B4}.Release|x64.Build.0 = Release|x64
 		{A6913F9A-502D-4F5F-AA1B-D027D65507C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A6913F9A-502D-4F5F-AA1B-D027D65507C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A6913F9A-502D-4F5F-AA1B-D027D65507C1}.Debug|x64.ActiveCfg = Debug|Any CPU
