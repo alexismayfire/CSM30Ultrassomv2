@@ -41,7 +41,10 @@
     //Carrega Galeria atual
     $(document).ready(function () {
         // Handler for .ready() called.
-        document.getElementById('galeria').innerHTML += '<img src="..\Imagens\john.jpg" width="100px" >';
+        // Agora, basta referenciar no restante do código, como na primeira linha
+        window.applicationBaseUrl = @Html.Raw(HttpUtility.JavaScriptStringEncode(Url.Content("~/"), true));
+
+        document.getElementById('galeria').innerHTML += '<img src="' + window.applicationBaseUrl + '\Content\\Images\\teste.bmp" width="100px" >';
         document.getElementById('galeria').innerHTML += "<img src=\"http://placehold.it/350x350\" width=\"400px\" height=\"150px\">";
         document.getElementById('galeria').innerHTML += "<img src=\"..\\Imagens\\john.jpg\" width=\"400px\" height=\"150px\">"
     });

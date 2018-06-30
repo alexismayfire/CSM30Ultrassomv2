@@ -1,4 +1,5 @@
 ﻿using System.Drawing;
+using System.Web;
 
 namespace Web.Lib
 {
@@ -8,7 +9,8 @@ namespace Web.Lib
         {
             int width = 60;
             int height = 60;
-            string nomeBmp = @".\" + nomeTxt.Replace(".txt", ".bmp");
+            var path = HttpContext.Current.Server.MapPath("~/Content/Images/");
+            string nomeBmp = path + nomeTxt.Replace(".txt", ".bmp");
             Bitmap Image = new Bitmap(width, height);
 
             for (int i = 0; i < width * height; i++)

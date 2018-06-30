@@ -24,16 +24,16 @@ namespace Web.Lib
 
         public void processa(string NomeArquivo, double[] g)
         {
-            salvaVetor(NomeArquivo, g);
+            salvaVetor(NomeArquivo, g, "Sent/");
             filaDeProcessos.Add(NomeArquivo);
             //TODO: Chamar o método que executa a thread
         }
 
-        public void salvaVetor(string NomeArquivo, double[] g)
+        public void salvaVetor(string NomeArquivo, double[] g, string Folder)
         {
             try
             {
-                var path = HttpContext.Current.Server.MapPath("~/Content/Signals/Sent/");
+                var path = HttpContext.Current.Server.MapPath("~/Content/Signals/" + Folder);
                 StreamWriter vetorSinal = new StreamWriter(path + NomeArquivo);//(@".\" + NomeArquivo);
 
                 foreach (var element in g)
@@ -43,8 +43,8 @@ namespace Web.Lib
             }
             catch (Exception e)
             {
-                Console.WriteLine("Can't write to file in:");
-                Console.WriteLine(e.Message);
+                System.Diagnostics.Debug.WriteLine("Can't write to file in:");
+                System.Diagnostics.Debug.WriteLine(e.Message);
             }
         }
 
@@ -103,7 +103,7 @@ namespace Web.Lib
 
                 try
                 {
-                    Console.WriteLine(DateTime.Now);
+                    System.Diagnostics.Debug.WriteLine(DateTime.Now);
 
                     double[] temp = new double[rows];
                     using (sr)
@@ -118,13 +118,12 @@ namespace Web.Lib
                     }
 
                     g = V.Dense(temp);
-                    Console.WriteLine("Arquivo g lido");
-                    Console.WriteLine(DateTime.Now);
+                    System.Diagnostics.Debug.WriteLine(DateTime.Now + " -> Arquivo g lido");
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e.Message);
-                    Console.WriteLine(e.StackTrace);
+                    System.Diagnostics.Debug.WriteLine(e.Message);
+                    System.Diagnostics.Debug.WriteLine(e.StackTrace);
                 }
 
                 sr.Dispose();
@@ -133,11 +132,26 @@ namespace Web.Lib
                 try
                 {
                     //var f = CGNECall(hFile, rows, columns, g);
-                    Console.WriteLine(DateTime.Now);
+                    System.Diagnostics.Debug.WriteLine(DateTime.Now + " -> começou o CGNE");
                     Matrix<double> h;
 
                     using (StreamReader reader = new StreamReader(File.OpenRead(hFile)))
                     {
+                        string line;
+                        int i = 0;
+                        double[,] matrixTemp = new double[rows, columns];
+                        while ((line = sr.ReadLine()) != null)
+                        {
+                            string[] tokens = line.Split(',');
+                            int j = 0;
+                            foreach(var token in tokens)
+                            {
+                                matrixTemp[i, j] = Double.Parse(token);
+                                j++;
+                            }
+                            i++;
+                        }
+                        /*
                         var blasMatrix = new BlasMatrix(reader, columns);
                         int i = 0;
                         double[,] matrixTemp = new double[rows, columns];
@@ -149,10 +163,13 @@ namespace Web.Lib
                             }
                             i++;
                         }
+                        */
 
-                        Console.WriteLine("Arquivo H lido");
-                        Console.WriteLine(DateTime.Now);
-
+                        System.Diagnostics.Debug.WriteLine(DateTime.Now + "Arquivo H lido");
+                        sr.DiscardBufferedData();
+                        reader.DiscardBufferedData();
+                        reader.Dispose();
+                        sr.Dispose();
                         h = M.Sparse(SparseCompressedRowMatrixStorage<double>.OfArray(matrixTemp));
 
                         //h = M.DenseOfArray(matrixTemp);
@@ -201,10 +218,9 @@ namespace Web.Lib
 
                         var beta = beta_upper.PointwiseDivide(alfa_upper);
 
-                        Console.WriteLine(DateTime.Now);
-                        //Console.WriteLine(GC.GetTotalMemory(true) / 1024 / 1024);
+                        System.Diagnostics.Debug.WriteLine(DateTime.Now + " -> before matrix 2");
+                        //System.Diagnostics.Debug.WriteLine(GC.GetTotalMemory(true) / 1024 / 1024);
                         //Console.Read();
-                        Console.WriteLine("before matrix 2");
 
 
 
@@ -214,38 +230,27 @@ namespace Web.Lib
                         p = pplus;
                         r = r_aux;
 
-                        Console.WriteLine(DateTime.Now);
-                        Console.WriteLine($"iteração {i}");
+                        System.Diagnostics.Debug.WriteLine(DateTime.Now + $" -> iteração {i}");
 
                     }
 
                     //COMENTAR ESSA LINHA PARA OTIMIZAR
-                    salvaVetor("SaidaProcessadaVetor.txt", f_aux.ToArray());
+                    salvaVetor("SaidaProcessadaVetor.txt", f_aux.ToArray(), "Processed/");
 
                     new GeraBitmap().ToBitmap(f_aux.ToArray(), filaDeProcessos.First());
-
-                    StreamWriter arquivo_gerado = new StreamWriter(@"C:\Users\alexismayfire\Desktop\CSM30\Trabalho 2\Imagem-B\arquivo_f1.txt");
-
-                    foreach (var element in f_aux)
-                    {
-                        arquivo_gerado.WriteLine(element.ToString());
-                    }
-                    Console.Read();
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e.Message);
-                    Console.WriteLine(e.StackTrace);
+                    System.Diagnostics.Debug.WriteLine(e.Message);
+                    System.Diagnostics.Debug.WriteLine(e.StackTrace);
                 }
 
                 sr.Dispose();
-
-                Console.Read();
             }
             catch (Exception e)
             {
-                Console.WriteLine("The file could not be read:");
-                Console.WriteLine(e.Message);
+                System.Diagnostics.Debug.WriteLine("The file could not be read:");
+                System.Diagnostics.Debug.WriteLine(e.Message);
             }
         }
 
@@ -260,7 +265,7 @@ namespace Web.Lib
 
         public static double[,] GenerateMatrix(String hFile, int rows, int columns)
         {
-            Console.WriteLine(DateTime.Now);
+            System.Diagnostics.Debug.WriteLine(DateTime.Now);
             using (StreamReader reader = new StreamReader(File.OpenRead(hFile)))
             {
                 var blasMatrix = new BlasMatrix(reader, columns);
@@ -275,8 +280,8 @@ namespace Web.Lib
                     i++;
                 }
 
-                Console.WriteLine("Arquivo H lido");
-                Console.WriteLine(DateTime.Now);
+                System.Diagnostics.Debug.WriteLine("Arquivo H lido");
+                System.Diagnostics.Debug.WriteLine(DateTime.Now);
 
                 return matrixTemp;
             }
