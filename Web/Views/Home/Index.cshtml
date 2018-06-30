@@ -1,0 +1,113 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+
+<div class="jumbotron">
+
+    <div>
+        <h2>Galeria</h2>
+        <div id="galeria"></div>
+    </div>
+
+    <!--Formulário que recebe o arquivo-->
+    <h2>Selecione o Arquivo</h2>
+    <form enctype="multipart/form-data">
+        <input id="upload" type=file accept="txt" name="files[]" size=30>
+    </form>
+
+    <h2>Largura da Imagem</h2>
+    <input id="larguraDaImagem" />
+
+    <h2>Nome Do Arquivo</h2>
+    <input id="nomeDoArquivo" />
+
+    <h2>Intensidade do Ganho</h2>
+    <input id="intensidade" />
+
+    <br />
+    <button class="btn-primary" onclick="EnviarArquivo()">Enviar Arquivo Para Transformação</button>
+
+    <!--Prévia do que foi lido do arquivo-->
+    <h2>Prévia</h2>
+    <textarea class="form-control" rows=35 cols=120 id="previa"></textarea>
+
+</div>
+
+<script>
+    
+    var resultadoFinal = new Array();
+
+    //Carrega Galeria atual
+    $(document).ready(function () {
+        // Handler for .ready() called.
+        document.getElementById('galeria').innerHTML += '<img src="..\Imagens\john.jpg" width="100px" >';
+        document.getElementById('galeria').innerHTML += "<img src=\"http://placehold.it/350x350\" width=\"400px\" height=\"150px\">";
+        document.getElementById('galeria').innerHTML += "<img src=\"..\\Imagens\\john.jpg\" width=\"400px\" height=\"150px\">"
+    });
+
+    //Função que lê o arquivo
+    function handleFileSelect(evt) {
+
+        //Verifica quantos arquivos foram lidos e faz uma lista
+        var files = evt.target.files;
+
+        //Pega o primeiro arquivo
+        f = files[0];
+
+        //Leitor de arquivos
+        var reader = new FileReader();
+
+        //Captura a informação
+        reader.onload = (function (theFile) {
+            return function (e) {
+
+                //Atualiza a informação lida no textarea de prévia
+                $('#previa').val(e.target.result);
+
+                console.log(e.target.result.split("\n"));
+
+                resultadoFinal = e.target.result.split("\n").map(Number);
+                
+            };
+        })(f);
+
+        // Read in the image file as a data URL.
+        reader.readAsText(f);
+    }
+
+    //Adiciona o listener (função ativada ao fazer o upload)
+    document.getElementById('upload').addEventListener('change', handleFileSelect, false);
+
+    function EnviarArquivo() {
+
+        console.log(resultadoFinal);
+
+        var larguraDaImagem = document.getElementById("larguraDaImagem").value;
+        var nomeDoArquivo = document.getElementById("nomeDoArquivo").value;
+        var intensidade = document.getElementById("intensidade").value;
+        
+        if (larguraDaImagem == "") {
+            larguraDaImagem = 60;
+        }
+
+        if (nomeDoArquivo == "") {
+            nomeDoArquivo = "Teste";
+        }
+
+        if (intensidade == "") {
+            intensidade = 0;
+        }
+        
+        $.post("http://localhost:51014/Home/Save",{
+            larguraDaImagem: larguraDaImagem,
+            nomeDoArquivo: nomeDoArquivo,
+            intensidade: intensidade,
+            resultadoFinal: resultadoFinal.join()        },
+                function (data, status) {
+                    alert("Data: " + data + "\nStatus: " + status);
+                });
+  
+    }
+
+</script>
