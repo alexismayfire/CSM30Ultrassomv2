@@ -30,7 +30,7 @@ namespace Web.Controllers
         }
    
         [HttpPost]
-        public string Save(string nomeDoArquivo, int intensidade, double[] g)
+        public string Save(string nomeDoArquivo, int intensidade, string resultadoFinal)
         {
             var path = System.Web.HttpContext.Current.Server.MapPath("~/Content/Images/");
             double intensidadeCalculada = 1 + (intensidade / 100.0);
@@ -47,7 +47,7 @@ namespace Web.Controllers
             foreach (FileInfo file in dir.GetFiles())
             {
                 if (file.ToString().Contains(nomeDoArquivoBuscado))
-                    return path + file.Name;
+                    return file.Name;
             }
 
             if(processamento.getElementoFila(nomeDoArquivo))
@@ -56,7 +56,15 @@ namespace Web.Controllers
             }
             else
             {
-                //processamento.processa(nomeDoArquivo, g, intensidadeCalculada);
+                int rows = 50816;
+                double[] g = new double[rows];
+                var lines = resultadoFinal.Split(',');
+                for (int i = 0; i < rows; i++)
+                {
+                    g[i] = Double.Parse(lines[i]);
+                }
+
+                processamento.processa(nomeDoArquivo, g, intensidadeCalculada);
                 return "Adicionando na fila de processamento";
             }
         }

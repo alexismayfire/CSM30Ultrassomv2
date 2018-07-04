@@ -13,10 +13,14 @@ namespace Web.Lib
     {
         List<string> filaDeProcessos;
         Thread t;
+        string path;
+        string pathImagens;
 
         public ProcessaUltrassom()
         {
             filaDeProcessos = new List<string>();
+            path = HttpContext.Current.Server.MapPath("~/Content/Signals/");
+            pathImagens = HttpContext.Current.Server.MapPath("~/Content/Images/");
         }
 
         public bool getElementoFila(string e)
@@ -52,13 +56,14 @@ namespace Web.Lib
         {
             try
             {
-                var path = HttpContext.Current.Server.MapPath("~/Content/Signals/" + Folder);
-                StreamWriter vetorSinal = new StreamWriter(path + NomeArquivo);//(@".\" + NomeArquivo);
+                StreamWriter vetorSinal = new StreamWriter(path + Folder + NomeArquivo);//(@".\" + NomeArquivo);
 
                 foreach (var element in g)
                 {
                     vetorSinal.WriteLine(element.ToString());
                 }
+
+                vetorSinal.Dispose();
             }
             catch (Exception e)
             {
@@ -68,6 +73,7 @@ namespace Web.Lib
         }
 
         // Apenas um teste, não é pra ser executado pela aplicação
+        /*
         public void GeraImagem()
         {
             String im = ".\\SaidaProcessadaVetor.txt";
@@ -87,6 +93,7 @@ namespace Web.Lib
 
             new GeraBitmap().ToBitmap(temp, im.Replace(".\\", ""));
         }
+        */
         /// <summary>
         /// Separar essa função em 3: lê vetor, lê matriz e CGNE
         /// </summary>
@@ -97,9 +104,9 @@ namespace Web.Lib
                 int rows = 50816;
                 int columns = 3600;
 
-                var path = HttpContext.Current.Server.MapPath("~/Content/Signals/");
+                //var path = HttpContext.Current.Server.MapPath("~/Content/Signals/");
                 string hFile = path + "H-1.txt";
-                string gFile = path + "Sent/" + this.filaDeProcessos.First();
+                string gFile = path + @"Sent\" + this.filaDeProcessos.First();
                 double intensidade = Double.Parse(gFile.Split('#').GetValue(1).ToString());
 
                 var M = Matrix<double>.Build;
@@ -248,12 +255,12 @@ namespace Web.Lib
 
                     string sinal = this.filaDeProcessos.First();
                     //COMENTAR ESSA LINHA PARA OTIMIZAR
-                    salvaVetor(sinal, f_aux.ToArray(), "Processed/");
+                    salvaVetor(sinal, f_aux.ToArray(), @"Processed\");
 
                     // Remove da fila
                     this.filaDeProcessos.Remove(sinal);
 
-                    new GeraBitmap().ToBitmap(f_aux.ToArray(), sinal);
+                    new GeraBitmap().ToBitmap(f_aux.ToArray(), sinal, pathImagens);
                 }
                 catch (Exception e)
                 {
