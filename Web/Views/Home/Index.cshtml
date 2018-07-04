@@ -10,6 +10,8 @@
         <div id="galeria"></div>
     </div>
 
+    <div id="imagem-lida"></div>
+
     <!--Formulário que recebe o arquivo-->
     <h2>Selecione o Arquivo</h2>
     <form enctype="multipart/form-data">
@@ -20,7 +22,7 @@
     <input id="larguraDaImagem" />
 
     <h2>Nome Do Arquivo</h2>
-    <input id="nomeDoArquivo" />
+    <input id="nomeDoArquivo" readonly />
 
     <h2>Intensidade do Ganho</h2>
     <input id="intensidade" />
@@ -45,8 +47,6 @@
         window.applicationBaseUrl = @Html.Raw(HttpUtility.JavaScriptStringEncode(Url.Content("~/"), true));
 
         document.getElementById('galeria').innerHTML += '<img src="' + window.applicationBaseUrl + '\Content\\Images\\teste.bmp" width="100px" >';
-        document.getElementById('galeria').innerHTML += "<img src=\"http://placehold.it/350x350\" width=\"400px\" height=\"150px\">";
-        document.getElementById('galeria').innerHTML += "<img src=\"..\\Imagens\\john.jpg\" width=\"400px\" height=\"150px\">"
     });
 
     //Função que lê o arquivo
@@ -74,6 +74,7 @@
                 
             };
         })(f);
+        $('#nomeDoArquivo').val(f.name);
 
         // Read in the image file as a data URL.
         reader.readAsText(f);
@@ -109,9 +110,16 @@
             nomeDoArquivo: nomeDoArquivo,
             intensidade: intensidade,
             resultadoFinal: resultadoFinal.join()        },
-                function (data, status) {
+            function (data, status) {
+                console.log(data);
+                if (data.indexOf(".bmp") !== -1) {
+                    window.applicationBaseUrl = @Html.Raw(HttpUtility.JavaScriptStringEncode(Url.Content("~/"), true));
+                    document.getElementById('imagem-lida').innerHTML = '<h2>Imagem solicitada</h2><img src="C:\\Users\\alexismayfire\\Source\\Repos\\CSM30Ultrassomv2\\Web\\Content\\Images\\#1,1#g-2%4.7.2018-17.28.51%" alt="imagem"/>'; 
+                }
+                else {
                     alert("Data: " + data + "\nStatus: " + status);
-                });
+                }
+            });
   
     }
 
