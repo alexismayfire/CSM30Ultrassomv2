@@ -85,8 +85,11 @@
     function EnviarArquivo() {
 
         console.log(resultadoFinal);
+        // larguraDaImagem não precisa, porque depende do tamanho do arquivo (é sempre sqrt(rows))
+        // var larguraDaImagem = document.getElementById("larguraDaImagem").value;
+        // No projeto será fixo 60x60!
 
-        var larguraDaImagem = document.getElementById("larguraDaImagem").value;
+        // Preciso pegar o nome do arquivo carregado no upload, e usar em nomeDoArquivo
         var nomeDoArquivo = document.getElementById("nomeDoArquivo").value;
         var intensidade = document.getElementById("intensidade").value;
         
@@ -103,7 +106,6 @@
         }
         
         $.post("http://localhost:51014/Home/Save",{
-            larguraDaImagem: larguraDaImagem,
             nomeDoArquivo: nomeDoArquivo,
             intensidade: intensidade,
             resultadoFinal: resultadoFinal.join()        },

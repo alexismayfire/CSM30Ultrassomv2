@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Web;
 using System.Web.Mvc;
 using Web.Lib;
@@ -29,30 +30,35 @@ namespace Web.Controllers
         }
    
         [HttpPost]
-        public string Save(int larguraDaImagem, string nomeDoArquivo, int intensidade, double[] resultadoFinal)
+        public string Save(string nomeDoArquivo, int intensidade, double[] g)
         {
+            var path = System.Web.HttpContext.Current.Server.MapPath("~/Content/Images/");
+            double intensidadeCalculada = 1 + (intensidade / 100.0);
+            nomeDoArquivo = "#" + intensidadeCalculada.ToString() + "#" + nomeDoArquivo;
+            string nomeDoArquivoBuscado = nomeDoArquivo.Replace(".txt", "");
+            
             string nomeArquivoImagem = nomeDoArquivo.Replace(".txt", ".bmp");
 
             //TODO: Alterar para retornar o arquivo com a imagem ou retornar uma mensagem de processando 
             // O parâmetro nomeDoArquivo recebe o valor que o usuário digita no formulário!
-            var path = System.Web.HttpContext.Current.Server.MapPath("~/Content/Images/");
-            if (System.IO.File.Exists(path + nomeArquivoImagem)) 
-                return "File exists."; //retorna o bitmap
 
-            else if(processamento.getElementoFila(nomeDoArquivo))
+            DirectoryInfo dir = new DirectoryInfo(path);
+
+            foreach (FileInfo file in dir.GetFiles())
+            {
+                if (file.ToString().Contains(nomeDoArquivoBuscado))
+                    return path + file.Name;
+            }
+
+            if(processamento.getElementoFila(nomeDoArquivo))
             {
                 return "O arquivo já está sendo processado.";
             }
             else
             {
-                processamento.processa(nomeDoArquivo, resultadoFinal);
+                //processamento.processa(nomeDoArquivo, g, intensidadeCalculada);
                 return "Adicionando na fila de processamento";
             }
-                
-
-
-            //return "Largura:" + larguraDaImagem + ", Nome:" + nomeDoArquivo + ", Intensidade:" + intensidade;
-
         }
     }
 }

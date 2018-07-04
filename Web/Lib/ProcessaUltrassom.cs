@@ -5,12 +5,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Web;
+using System.Threading;
 
 namespace Web.Lib
 {
     public class ProcessaUltrassom
     {
         List<string> filaDeProcessos;
+        Thread t;
 
         public ProcessaUltrassom()
         {
@@ -22,11 +24,28 @@ namespace Web.Lib
             return filaDeProcessos.Contains(e);
         }
 
-        public void processa(string NomeArquivo, double[] g)
+        public void processa(string NomeArquivo, double[] g, double intensidade)
         {
             salvaVetor(NomeArquivo, g, "Sent/");
             filaDeProcessos.Add(NomeArquivo);
-            //TODO: Chamar o método que executa a thread
+
+            if (t is null)
+            {
+                t = new Thread(MakeImage);
+                t.Start();
+            }
+                
+        }
+
+        void MakeImage()
+        {
+            while (true)
+            {
+                if (this.filaDeProcessos.Count() != 0)
+                {
+                    CGNE();
+                }
+            }
         }
 
         public void salvaVetor(string NomeArquivo, double[] g, string Folder)
@@ -68,31 +87,20 @@ namespace Web.Lib
 
             new GeraBitmap().ToBitmap(temp, im.Replace(".\\", ""));
         }
-
+        /// <summary>
+        /// Separar essa função em 3: lê vetor, lê matriz e CGNE
+        /// </summary>
         public void CGNE()
         {
             try
             {
-                bool debug = false;
-                String gFile;
-                String hFile;
-                int rows;
-                int columns;
+                int rows = 50816;
+                int columns = 3600;
 
-                if (debug)
-                {
-                    gFile = @"C:\Users\alexismayfire\Desktop\CSM30\Trabalho 2\Imagem-B\g-1.txt";
-                    hFile = @"C:\Users\alexismayfire\Desktop\CSM30\Trabalho 2\Imagem-B\H-1.txt";
-                    rows = 10;
-                    columns = 6;
-                }
-                else
-                {
-                    gFile = @"C:\Users\alexismayfire\Desktop\CSM30\Trabalho 2\Imagem-A\g-1.txt";
-                    hFile = @"C:\Users\alexismayfire\Desktop\CSM30\Trabalho 2\Imagem-A\H-1.txt";
-                    rows = 50816;
-                    columns = 3600;
-                }
+                var path = HttpContext.Current.Server.MapPath("~/Content/Signals/");
+                string hFile = path + "H-1.txt";
+                string gFile = path + "Sent/" + this.filaDeProcessos.First();
+                double intensidade = Double.Parse(gFile.Split('#').GetValue(1).ToString());
 
                 var M = Matrix<double>.Build;
                 var V = Vector<double>.Build;
@@ -101,6 +109,10 @@ namespace Web.Lib
 
                 var g = V.Dense(rows);
 
+                /*
+                 * Separar para função de vetor
+                 * 
+                 */
                 try
                 {
                     System.Diagnostics.Debug.WriteLine(DateTime.Now);
@@ -112,7 +124,10 @@ namespace Web.Lib
                         int i = 0;
                         while ((line = sr.ReadLine()) != null)
                         {
-                            temp[i] = Double.Parse(line);
+                            if (intensidade != 1)
+                                temp[i] = Double.Parse(line) * intensidade;
+                            else
+                                temp[i] = Double.Parse(line);
                             i++;
                         }
                     }
@@ -128,7 +143,11 @@ namespace Web.Lib
 
                 sr.Dispose();
                 sr = new StreamReader(hFile);
-
+                /*
+                 * Separar para função de matriz
+                 * 
+                 */
+                
                 try
                 {
                     //var f = CGNECall(hFile, rows, columns, g);
@@ -205,12 +224,9 @@ namespace Web.Lib
 
                         var alfa = alfa_upper.PointwiseDivide(alfa_down);
 
-                        //f = f_aux;
                         double alfa_scalar = alfa.Single();
                         f_aux += f.Add(p.Multiply(alfa_scalar));
                         f = f_aux;
-                        //var temp = h.Multiply(alfa_scalar);
-                        //r_aux = r.Subtract(temp.Multiply(p));
                         r_aux = r.Subtract(h.Multiply(alfa_scalar).Multiply(p));
 
                         var r_auxT = r_aux.ToRowMatrix();
@@ -219,10 +235,6 @@ namespace Web.Lib
                         var beta = beta_upper.PointwiseDivide(alfa_upper);
 
                         System.Diagnostics.Debug.WriteLine(DateTime.Now + " -> before matrix 2");
-                        //System.Diagnostics.Debug.WriteLine(GC.GetTotalMemory(true) / 1024 / 1024);
-                        //Console.Read();
-
-
 
                         double beta_scalar = beta.Single();
                         p_aux = hT.Multiply(r_aux);
@@ -234,10 +246,14 @@ namespace Web.Lib
 
                     }
 
+                    string sinal = this.filaDeProcessos.First();
                     //COMENTAR ESSA LINHA PARA OTIMIZAR
-                    salvaVetor("SaidaProcessadaVetor.txt", f_aux.ToArray(), "Processed/");
+                    salvaVetor(sinal, f_aux.ToArray(), "Processed/");
 
-                    new GeraBitmap().ToBitmap(f_aux.ToArray(), filaDeProcessos.First());
+                    // Remove da fila
+                    this.filaDeProcessos.Remove(sinal);
+
+                    new GeraBitmap().ToBitmap(f_aux.ToArray(), sinal);
                 }
                 catch (Exception e)
                 {
